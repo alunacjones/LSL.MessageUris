@@ -39,7 +39,7 @@ namespace LSL.MessageUris
             builder.Scheme = "send-message";
             builder.Path = Uri.EscapeDataString(DestinationQueue);
             builder.Host = string.Empty;
-            builder.Query = QueryParamters.ToString();
+            builder.Query = QueryParameters.ToString();
 
             return builder.Uri;
         }
@@ -96,8 +96,8 @@ namespace LSL.MessageUris
                 return (false, $"Expected to find one path segment but found {realUri.Segments.Length} ({realUri.LocalPath})");
             }
 
-            result = new SendMessageUri(realUri.Segments[0].Trim('/'));
-            result.QueryParamters = HttpUtility.ParseQueryString(realUri.Query);
+            result = new SendMessageUri(Uri.UnescapeDataString(realUri.Segments[0].Trim('/')));
+            result.QueryParameters = HttpUtility.ParseQueryString(realUri.Query);
 
             return (true, string.Empty);
         }
