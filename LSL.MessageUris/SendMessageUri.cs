@@ -12,9 +12,9 @@ namespace LSL.MessageUris
         /// Default constructor
         /// </summary>
         /// <param name="destinationQueue">Initalises the DestinationQueue value to this</param>
-        public SendMessageUri(string destinationQueue)
+        public SendMessageUri(string destinationQueue) 
         {
-            DestinationQueue = destinationQueue;
+            DestinationQueue = destinationQueue;            
         }
 
         /// <summary>

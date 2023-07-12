@@ -12,6 +12,6 @@ namespace LSL.MessageUris
         /// The query parameters
         /// </summary>
         /// <returns></returns>
-        public NameValueCollection QueryParameters { get; protected set; } = HttpUtility.ParseQueryString(string.Empty);
+        public NameValueCollection QueryParameters { get; protected set; } = HttpUtility.ParseQueryString(string.Empty);        
     }
 }

@@ -24,10 +24,10 @@ namespace LSL.MessageUris.Tests
         [Test]
         public void ToString_WithQueryParameters_ShouldReturnTheExpectedResult()
         {
-            var uri = new SendMessageUri("aqueue");
-            uri.QueryParameters.Add("single", "a-val");
-            uri.QueryParameters.Add("double", "first");
-            uri.QueryParameters.Add("double", "second");
+            var uri = new SendMessageUri("aqueue")
+                .AddQueryParameter("single", "a-val")
+                .AddQueryParameter("double", "first")
+                .AddQueryParameter("double", "second");
 
             uri.ToString().Should().Be("send-message:aqueue?single=a-val&double=first&double=second");
         }
