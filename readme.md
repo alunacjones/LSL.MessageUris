@@ -18,9 +18,9 @@ var uri = new SendMessageUri("my queue");
 // uri.DestinationAddress will be set to "my queue"
 
 // QueryParameters allows for user defined options that your system may interpret for further context
-uri.QueryParamters.Add("single", "a-val");
-uri.QueryParamters.Add("double", "first");
-uri.QueryParamters.Add("double", "second");
+uri.QueryParameters.Add("single", "a-val");
+uri.QueryParameters.Add("double", "first");
+uri.QueryParameters.Add("double", "second");
 
 var realUri = uri.ToUri();
 
