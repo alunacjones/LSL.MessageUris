@@ -68,13 +68,6 @@ namespace LSL.MessageUris.Tests
             SendMessageUri.Parse("send-message:my-queue").DestinationQueue.Should().Be("my-queue");
         }
 
-        [Test]
-        public void Test()
-        {
-            //TODO: Fix typo in base class for QueryParameters!!
-            //ALSO: Test that encoding and decoding looks fine after uri conversion i.e. is the use of Segments okay to get unencoded parts?
-            var uri = SendMessageUri.Parse("send-message:my-queue?my=12");
-        }
         [TestCase("", "Invalid URI format")]
         [TestCase("wrong-scheme:aqueue", "Expected a scheme of 'send-message' but found 'wrong-scheme'")]
         [TestCase("send-message:aqueue/too-many-segments", "Expected to find one path segment but found 2 (aqueue/too-many-segments)")]

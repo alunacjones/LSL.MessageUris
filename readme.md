@@ -34,13 +34,56 @@ For a potentially exception-throwing parse (if the format is wrong) see the foll
 ```csharp
 var uri = SendMessageUri.Parse("send-message:my-queue");
 
-// This works and you end up with an instance with DesctinationAddress set to "my-queue" but with no query parameters
+// This works and you end up with an instance with DestinationAddress set to "my-queue" but with no query parameters
 ```
 
 For a safe attempt at parsing:
 
 ```csharp
-if (SendMessageUri.TryParse(uri, out var result))
+if (SendMessageUri.TryParse("send-message:my-queue", out var result))
+{
+    // do something with result now
+};
+```
+
+## LSL.MessageUris.PublishMessageUri
+
+### Creation
+
+Create an instance of the `PublishMessageUri`:
+
+```csharp
+var uri = new PublishMessageUri("my exchange", "my topic");
+
+// uri.Exchange will be set to "my exchange"
+// uri.Topic will be set to "my topic"
+
+// QueryParameters allows for user defined options that your system may interpret for further context
+uri.QueryParameters.Add("single", "a-val");
+uri.QueryParameters.Add("double", "first");
+uri.QueryParameters.Add("double", "second");
+
+var realUri = uri.ToUri();
+
+// realUri.ToString() will be "publish-message:my exchange/my topic?single=a-val&double=first&double=second"
+```
+
+### Parsing
+
+For a potentially exception-throwing parse (if the format is wrong) see the following example:
+
+```csharp
+var uri = PublishMessageUri.Parse("publish-message:my-ex/my-topic");
+
+// This works and you end up with an instance with Exchange set to "my-queue" 
+// and Topic set to "my-topic" 
+// but with no query parameters
+```
+
+For a safe attempt at parsing:
+
+```csharp
+if (SendMessageUri.TryParse("publish-message:my-ex/my-topic", out var result))
 {
     // do something with result now
 };
