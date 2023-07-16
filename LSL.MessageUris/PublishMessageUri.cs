@@ -9,7 +9,7 @@ namespace LSL.MessageUris
     public class PublishMessageUri : UriWithOptionalQueryString
     {
         /// <summary>
-        /// Default constructor
+        /// Constructor for setting up the topic and destination exchange
         /// </summary>
         /// <param name="exchange"></param>
         /// <param name="topic"></param>
@@ -18,6 +18,13 @@ namespace LSL.MessageUris
             Exchange = exchange;
             Topic = topic;
         }
+
+        /// <summary>
+        /// Constructor for only setting up a topic
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <returns></returns>
+        public PublishMessageUri(string topic) : this(string.Empty, topic) {}
 
         /// <summary>
         /// The exchange name
@@ -30,6 +37,13 @@ namespace LSL.MessageUris
         /// </summary>
         /// <value></value>
         public string Topic { get; }
+
+        /// <summary>
+        /// If the exchange is set then it returns a string with the format `{Topic}@{DestinationExchange}` 
+        /// otherwise it returns the the topic
+        /// </summary>
+        /// <value></value>
+        public string TopicAndExchange => BuildFullName(IdentityFormatter);
 
         /// <summary>
         /// Renders the uri as a string of the format 'publish-message://{Exchange}/{Topic}?any=user&amp;defined=options'
@@ -45,7 +59,7 @@ namespace LSL.MessageUris
         {
             var builder = new UriBuilder();
             builder.Scheme = "publish-message";
-            builder.Path = $"{Uri.EscapeDataString(Exchange)}/{Uri.EscapeDataString(Topic)}";
+            builder.Path = BuildFullName(Uri.EscapeDataString);
             builder.Host = string.Empty;
             builder.Query = QueryParameters.ToString();
 
@@ -69,6 +83,21 @@ namespace LSL.MessageUris
 
             return result;
         }
+
+        /// <summary>
+        /// Parses a Uri into a PublishMessageUri
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <returns></returns>
+        public static PublishMessageUri Parse(Uri uri) => Parse(uri.ToString());
+
+        /// <summary>
+        /// Tries to parse a Uri into a PublishMessageUri
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool TryParse(Uri uri, out PublishMessageUri result) => TryParse(uri.ToString(), out result);
 
         /// <summary>
         /// Tries to parse a string into a PublishMessageUri
@@ -98,20 +127,31 @@ namespace LSL.MessageUris
                 return (false, $"Expected to find no host name but found '{realUri.Host}'");
             }
 
-            if (realUri.Segments.Length != 2)
+            if (realUri.Segments.Length != 1)
             {
                 result = null;
-                return (false, $"Expected to find two path segments but found {realUri.Segments.Length} ({realUri.LocalPath})");
+                return (false, $"Expected to find one path segment but found {realUri.Segments.Length} ({realUri.LocalPath})");
             }
 
-            result = new PublishMessageUri(
-                Uri.UnescapeDataString(realUri.Segments[0].Trim('/')),
-                Uri.UnescapeDataString(realUri.Segments[1].Trim('/'))
-            );
+            var split = realUri.Segments[0].Split('@');
 
+            if (split.Length > 2)
+            {
+                result = null;
+                return (false, $"Expected to find one '@' synmbol but found {split.Length - 1} ({realUri.LocalPath})");                
+            }
+
+            var topic =  Uri.UnescapeDataString(split[0]);
+            var exchange = split.Length == 2 
+                ? Uri.UnescapeDataString(split[1])
+                : string.Empty;
+
+            result = new PublishMessageUri(exchange, topic);
             result.QueryParameters = HttpUtility.ParseQueryString(realUri.Query);
 
             return (true, string.Empty);
         }
+
+        private string BuildFullName(Func<string, string> formatter) => BuildFullName(formatter, Topic, Exchange);
     }
 }

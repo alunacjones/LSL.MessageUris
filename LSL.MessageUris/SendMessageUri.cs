@@ -41,11 +41,11 @@ namespace LSL.MessageUris
         public string DestinationExchange { get; }
 
         /// <summary>
-        /// If the exchange is set the it returns a string with the format `{DestinationQueue}@{DestinationExchange}
+        /// If the exchange is set then it returns a string with the format `{DestinationQueue}@{DestinationExchange}`
         /// otherwise it returns the destination queue
         /// </summary>
         /// <value></value>
-        public string DestinationQueueAndExchange => BuidFullName(IdentityFormatter);
+        public string DestinationQueueAndExchange => BuildFullName(IdentityFormatter);
 
         /// <summary>
         /// Renders the uri as a string of the format 'send-message://{DestinationQueue}?any=user&amp;defined=options'
@@ -61,7 +61,7 @@ namespace LSL.MessageUris
         {
             var builder = new UriBuilder();
             builder.Scheme = "send-message";
-            builder.Path = BuidFullName(Uri.EscapeDataString);
+            builder.Path = BuildFullName(Uri.EscapeDataString);
             builder.Host = string.Empty;
             builder.Query = QueryParameters.ToString();
 
@@ -85,6 +85,21 @@ namespace LSL.MessageUris
 
             return result;
         }
+
+        /// <summary>
+        /// Parses a Uri into a SendMessageUri
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <returns></returns>
+        public static SendMessageUri Parse(Uri uri) => Parse(uri.ToString());
+
+        /// <summary>
+        /// Tries to parse a Uri into a SendMessageUri
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool TryParse(Uri uri, out SendMessageUri result) => TryParse(uri.ToString(), out result);
 
         /// <summary>
         /// Tries to parse a string into a SendMessageUri
@@ -130,7 +145,7 @@ namespace LSL.MessageUris
 
             var queue =  Uri.UnescapeDataString(split[0]);
             var exchange = split.Length == 2 
-                ? Uri.EscapeDataString(split[1])
+                ? Uri.UnescapeDataString(split[1])
                 : string.Empty;
 
             result = new SendMessageUri(queue, exchange);
@@ -139,11 +154,6 @@ namespace LSL.MessageUris
             return (true, string.Empty);
         }
 
-        private static Func<string, string> IdentityFormatter = new Func<string, string>(s => s);
-
-        private string BuidFullName(Func<string, string> formatter) =>
-            string.IsNullOrEmpty(DestinationExchange)
-                ? formatter(DestinationQueue)
-                : $"{formatter(DestinationQueue)}@{formatter(DestinationExchange)}";
+        private string BuildFullName(Func<string, string> formatter) => BuildFullName(formatter, DestinationQueue, DestinationExchange);
     }
 }

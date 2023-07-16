@@ -9,7 +9,9 @@ namespace LSL.MessageUris.Tests
         [Test]
         public void Constructor_ShouldGiveUsTheExpectedInstance()
         {
-            new SendMessageUri("my queue").DestinationQueue.Should().Be("my queue");
+            var result = new SendMessageUri("my queue");
+            result.DestinationQueue.Should().Be("my queue");
+            result.DestinationExchange.Should().BeEmpty();
         }
 
         [TestCase("aqueue", "send-message:aqueue")]
@@ -49,8 +51,7 @@ namespace LSL.MessageUris.Tests
         [TestCase("send-message:aqueue", true, "aqueue", "")]
         [TestCase("send-message:aqueue%2fasd", true, "aqueue/asd", "")]
         [TestCase("send-message:a queue %24%25%40%3A%2F", true, "a queue $%@:/", "")]
-        [TestCase("send-message:aqueue?param1=1&param2=2&param2=3", true, "aqueue", "param1=1&param2=2&param2=3")]
-        [TestCase("send-message:VeraCore.Demo.LP-9NK4JG3%40VeraCore.Demo.Direct?routeToDev=1", true, "VeraCore.Demo.LP-9NK4JG3@VeraCore.Demo.Direct", "routeToDev=1")]        
+        [TestCase("send-message:aqueue?param1=1&param2=2&param2=3", true, "aqueue", "param1=1&param2=2&param2=3")]     
         public void TryParse_GivenAString_ItShouldReturnTheExpectedResult(string uri, bool expectedResult, string expectedDestinationQueue, string expectedQueryParameters)
         {
             var succeeded = SendMessageUri.TryParse(uri, out var result);
@@ -63,8 +64,29 @@ namespace LSL.MessageUris.Tests
             }
         }
 
+        [TestCase("wrong-scheme:aqueue", false, "", "")]
+        [TestCase("send-message:aqueue/too-many-segments", false, "", "")]
+        [TestCase("send-message://ahost/aqueue/too-many-segments", false, "", "")]
+        [TestCase("send-message://ahost/aqueue", false, "", "")]
+        [TestCase("send-message:aqueue", true, "aqueue", "")]
+        [TestCase("send-message:aqueue%2fasd", true, "aqueue/asd", "")]
+        [TestCase("send-message:a queue %24%25%40%3A%2F", true, "a queue $%@:/", "")]
+        [TestCase("send-message:aqueue?param1=1&param2=2&param2=3", true, "aqueue", "param1=1&param2=2&param2=3")]     
+        public void TryParse_GivenAUri_ItShouldReturnTheExpectedResult(string uri, bool expectedResult, string expectedDestinationQueue, string expectedQueryParameters)
+        {
+            var succeeded = SendMessageUri.TryParse(new Uri(uri), out var result);
+            succeeded.Should().Be(expectedResult);
+
+            if (expectedResult)
+            {
+                result.DestinationQueue.Should().Be(expectedDestinationQueue);
+                result.QueryParameters.ToString().Should().Be(expectedQueryParameters);
+            }
+        }        
+
         [TestCase("send-message:aqueue@asd@qwe", false, "", "", "qwe")]
         [TestCase("send-message:aqueue@asd", true, "aqueue", "asd", "aqueue@asd")]
+        [TestCase("send-message:aqueue%2fa@asd%2fb", true, "aqueue/a", "asd/b", "aqueue/a@asd/b")]
         public void TryParse_GivenAQueueAndAnExchange_ItShouldReturnTheExpectedResult(string uri, bool expectedResult, string expectedDestinationQueue, string expectedExchange, string expectedQueueAndExchange)
         {
             var succeeded = SendMessageUri.TryParse(uri, out var result);
@@ -83,6 +105,12 @@ namespace LSL.MessageUris.Tests
         public void Parse_GivenAValidString_ItShouldReturnAUri()
         {
             SendMessageUri.Parse("send-message:my-queue").DestinationQueue.Should().Be("my-queue");
+        }
+
+        [Test]
+        public void Parse_GivenAValidUri_ItShouldReturnAUri()
+        {
+            SendMessageUri.Parse(new Uri("send-message:my-queue")).DestinationQueue.Should().Be("my-queue");
         }
 
         [TestCase("", "Invalid URI format")]

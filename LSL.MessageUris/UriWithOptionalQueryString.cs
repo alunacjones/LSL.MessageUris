@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Specialized;
 using System.Web;
 
@@ -13,5 +14,23 @@ namespace LSL.MessageUris
         /// </summary>
         /// <returns></returns>
         public NameValueCollection QueryParameters { get; protected set; } = HttpUtility.ParseQueryString(string.Empty);        
+
+        /// <summary>
+        /// Build an optional @ separated string from the given parameters
+        /// </summary>
+        /// <param name="formatter">The format function</param>
+        /// <param name="requiredPart">The part that will always be rendered</param>
+        /// <param name="optionalPart">The optional part, if included will be appended to the required part with '@optionalPart'</param>
+        /// <returns></returns>
+        protected string BuildFullName(Func<string, string> formatter, string requiredPart, string optionalPart) =>
+            string.IsNullOrEmpty(optionalPart)
+                ? formatter(requiredPart)
+                : $"{formatter(requiredPart)}@{formatter(optionalPart)}";        
+
+        /// <summary>
+        /// An identity function that returns the string it was given
+        /// </summary>
+        /// <returns></returns>
+        protected static Func<string, string> IdentityFormatter = new Func<string, string>(s => s);                
     }
 }
