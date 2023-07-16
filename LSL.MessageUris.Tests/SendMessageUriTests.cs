@@ -50,6 +50,7 @@ namespace LSL.MessageUris.Tests
         [TestCase("send-message:aqueue%2fasd", true, "aqueue/asd", "")]
         [TestCase("send-message:a queue %24%25%40%3A%2F", true, "a queue $%@:/", "")]
         [TestCase("send-message:aqueue?param1=1&param2=2&param2=3", true, "aqueue", "param1=1&param2=2&param2=3")]
+        [TestCase("send-message:VeraCore.Demo.LP-9NK4JG3%40VeraCore.Demo.Direct?routeToDev=1", true, "VeraCore.Demo.LP-9NK4JG3@VeraCore.Demo.Direct", "routeToDev=1")]        
         public void TryParse_GivenAString_ItShouldReturnTheExpectedResult(string uri, bool expectedResult, string expectedDestinationQueue, string expectedQueryParameters)
         {
             var succeeded = SendMessageUri.TryParse(uri, out var result);
@@ -59,6 +60,22 @@ namespace LSL.MessageUris.Tests
             {
                 result.DestinationQueue.Should().Be(expectedDestinationQueue);
                 result.QueryParameters.ToString().Should().Be(expectedQueryParameters);
+            }
+        }
+
+        [TestCase("send-message:aqueue@asd@qwe", false, "", "", "qwe")]
+        [TestCase("send-message:aqueue@asd", true, "aqueue", "asd", "aqueue@asd")]
+        public void TryParse_GivenAQueueAndAnExchange_ItShouldReturnTheExpectedResult(string uri, bool expectedResult, string expectedDestinationQueue, string expectedExchange, string expectedQueueAndExchange)
+        {
+            var succeeded = SendMessageUri.TryParse(uri, out var result);
+            succeeded.Should().Be(expectedResult);
+
+            if (expectedResult)
+            {
+                result.DestinationQueue.Should().Be(expectedDestinationQueue);
+                result.DestinationExchange.Should().Be(expectedExchange);
+                result.DestinationQueueAndExchange.Should().Be(expectedQueueAndExchange);
+                
             }
         }
 

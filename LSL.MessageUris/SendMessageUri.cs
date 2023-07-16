@@ -9,12 +9,23 @@ namespace LSL.MessageUris
     public class SendMessageUri : UriWithOptionalQueryString
     {
         /// <summary>
-        /// Default constructor
+        /// Constrcutor to use when only specifying a queue (exchange will be an empty string)
         /// </summary>
         /// <param name="destinationQueue">Initalises the DestinationQueue value to this</param>
-        public SendMessageUri(string destinationQueue) 
+        public SendMessageUri(string destinationQueue) : this(destinationQueue, string.Empty) 
         {
             DestinationQueue = destinationQueue;            
+        }
+
+        /// <summary>
+        /// Constructor to use when needing to encode a queue and an exchange
+        /// </summary>
+        /// <param name="destinationQueue"></param>
+        /// <param name="destinationExchange"></param>
+        public SendMessageUri(string destinationQueue, string destinationExchange)
+        {
+            DestinationQueue = destinationQueue;
+            DestinationExchange = destinationExchange;
         }
 
         /// <summary>
@@ -22,6 +33,19 @@ namespace LSL.MessageUris
         /// </summary>
         /// <value></value>
         public string DestinationQueue { get; }
+
+        /// <summary>
+        /// The destination exchange name
+        /// </summary>
+        /// <value></value>
+        public string DestinationExchange { get; }
+
+        /// <summary>
+        /// If the exchange is set the it returns a string with the format `{DestinationQueue}@{DestinationExchange}
+        /// otherwise it returns the destination queue
+        /// </summary>
+        /// <value></value>
+        public string DestinationQueueAndExchange => BuidFullName(IdentityFormatter);
 
         /// <summary>
         /// Renders the uri as a string of the format 'send-message://{DestinationQueue}?any=user&amp;defined=options'
@@ -37,7 +61,7 @@ namespace LSL.MessageUris
         {
             var builder = new UriBuilder();
             builder.Scheme = "send-message";
-            builder.Path = Uri.EscapeDataString(DestinationQueue);
+            builder.Path = BuidFullName(Uri.EscapeDataString);
             builder.Host = string.Empty;
             builder.Query = QueryParameters.ToString();
 
@@ -96,10 +120,30 @@ namespace LSL.MessageUris
                 return (false, $"Expected to find one path segment but found {realUri.Segments.Length} ({realUri.LocalPath})");
             }
 
-            result = new SendMessageUri(Uri.UnescapeDataString(realUri.Segments[0].Trim('/')));
+            var split = realUri.Segments[0].Split('@');
+
+            if (split.Length > 2)
+            {
+                result = null;
+                return (false, $"Expected to find one '@' synmbol but found {split.Length - 1} ({realUri.LocalPath})");                
+            }
+
+            var queue =  Uri.UnescapeDataString(split[0]);
+            var exchange = split.Length == 2 
+                ? Uri.EscapeDataString(split[1])
+                : string.Empty;
+
+            result = new SendMessageUri(queue, exchange);
             result.QueryParameters = HttpUtility.ParseQueryString(realUri.Query);
 
             return (true, string.Empty);
         }
+
+        private static Func<string, string> IdentityFormatter = new Func<string, string>(s => s);
+
+        private string BuidFullName(Func<string, string> formatter) =>
+            string.IsNullOrEmpty(DestinationExchange)
+                ? formatter(DestinationQueue)
+                : $"{formatter(DestinationQueue)}@{formatter(DestinationExchange)}";
     }
 }

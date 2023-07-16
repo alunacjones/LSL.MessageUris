@@ -1,0 +1,7 @@
+{
+    "yaml.schemas": {
+        "https://json.schemastore.org/appveyor.json": [
+            "appveyor.yml"
+        ]
+    }
+}

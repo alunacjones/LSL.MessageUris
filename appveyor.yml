@@ -1,6 +1,9 @@
 version: 1.0.{build}
 image: Visual Studio 2022
 configuration: Release
+branches:
+  only:
+    - master  
 environment:
   COVERALLS_REPO_TOKEN:
     secure: 8kCxZfx2eqE1DvoN1roeol8NeDVHXmkV8uqv2Atzujjfu7SB88z6KKKaYRAtObbl
@@ -14,7 +17,7 @@ install:
   - sh: ./appveyor-tools/secure-file -decrypt LSL.MessageUris/LSL.snk.enc -secret $keyfile_secret -salt $keyfile_salt    
 dotnet_csproj:
   patch: true
-  file: '**\*.csproj'
+  file: '**\*.csproj'  
   version: '{version}'
   package_version: '{version}'
   assembly_version: '{version}'
