@@ -125,5 +125,12 @@ namespace LSL.MessageUris.Tests
                 .Throw<FormatException>()
                 .WithMessage(expectedMessage);
         }
+
+        [Test]
+        public void ImplicitCastToUri_ItShouldProduceTheExpectedUri()
+        {
+            Uri result = new SendMessageUri("my-queue", "my-exchange");
+            result.ToString().Should().Be("send-message:my-queue@my-exchange");
+        }        
     }
 }

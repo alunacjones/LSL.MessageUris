@@ -11,9 +11,9 @@ namespace LSL.MessageUris
         /// <summary>
         /// Constructor for setting up the topic and destination exchange
         /// </summary>
-        /// <param name="exchange"></param>
         /// <param name="topic"></param>
-        public PublishMessageUri(string exchange, string topic) 
+        /// <param name="exchange"></param>
+        public PublishMessageUri(string topic, string exchange) 
         {
             Exchange = exchange;
             Topic = topic;
@@ -24,7 +24,7 @@ namespace LSL.MessageUris
         /// </summary>
         /// <param name="topic"></param>
         /// <returns></returns>
-        public PublishMessageUri(string topic) : this(string.Empty, topic) {}
+        public PublishMessageUri(string topic) : this(topic, string.Empty) {}
 
         /// <summary>
         /// The exchange name
@@ -146,11 +146,17 @@ namespace LSL.MessageUris
                 ? Uri.UnescapeDataString(split[1])
                 : string.Empty;
 
-            result = new PublishMessageUri(exchange, topic);
+            result = new PublishMessageUri(topic, exchange);
             result.QueryParameters = HttpUtility.ParseQueryString(realUri.Query);
 
             return (true, string.Empty);
         }
+
+        /// <summary>
+        /// Implicit conversion to a Uri
+        /// </summary>
+        /// <param name="source"></param>
+        public static implicit operator Uri(PublishMessageUri source) => source.ToUri();
 
         private string BuildFullName(Func<string, string> formatter) => BuildFullName(formatter, Topic, Exchange);
     }

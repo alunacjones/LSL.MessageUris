@@ -154,6 +154,12 @@ namespace LSL.MessageUris
             return (true, string.Empty);
         }
 
+        /// <summary>
+        /// Implicit conversion to a Uri
+        /// </summary>
+        /// <param name="source"></param>
+        public static implicit operator Uri(SendMessageUri source) => source.ToUri();
+
         private string BuildFullName(Func<string, string> formatter) => BuildFullName(formatter, DestinationQueue, DestinationExchange);
     }
 }

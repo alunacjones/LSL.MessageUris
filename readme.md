@@ -4,6 +4,8 @@
 
 # LSL.MessageUris
 
+> **NOTE**: Since V1.0.7 the constructor for `PublishMessageUri` has had it's parameters swapped around so `topic` is the first parameter and `exchange` is the second. This was done since exchange is seen more as an optional parameter.
+
 A simple library to provide message uris that can be used to encapsulate intent for data.
 
 ## LSL.MessageUris.SendMessageUri
@@ -66,7 +68,7 @@ if (SendMessageUri.TryParse("send-message:my-queue", out var result))
 Create an instance of the `PublishMessageUri`:
 
 ```csharp
-var uri = new PublishMessageUri("my exchange", "my topic");
+var uri = new PublishMessageUri("my topic", "my exchange");
 
 // uri.Exchange will be set to "my exchange"
 // uri.Topic will be set to "my topic"

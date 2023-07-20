@@ -9,7 +9,7 @@ namespace LSL.MessageUris.Tests
         [Test]
         public void Constructor_ShouldGiveUsTheExpectedInstance()
         {
-            var uri = new PublishMessageUri("my exchange", "my topic");
+            var uri = new PublishMessageUri("my topic", "my exchange");
 
             uri.Exchange.Should().Be("my exchange");
             uri.Topic.Should().Be("my topic");
@@ -30,13 +30,13 @@ namespace LSL.MessageUris.Tests
         [TestCase("an.ex.2 $%@:/", "a.topic.2 $%@:/", "publish-message:a.topic.2 %24%25%40%3A%2F@an.ex.2 %24%25%40%3A%2F")]
         public void ToString_ShouldReturnTheExpectedResult(string exchange, string topic, string expectedResult)
         {
-            new PublishMessageUri(exchange, topic).ToString().Should().Be(expectedResult);
+            new PublishMessageUri(topic, exchange).ToString().Should().Be(expectedResult);
         }
 
         [Test]
         public void ToString_WithQueryParameters_ShouldReturnTheExpectedResult()
         {
-            var uri = new PublishMessageUri("an-ex", "a-topic")
+            var uri = new PublishMessageUri("a-topic", "an-ex")
                 .AddQueryParameter("single", "a-val")
                 .AddQueryParameter("double", "first")
                 .AddQueryParameter("double", "second");
@@ -50,7 +50,7 @@ namespace LSL.MessageUris.Tests
         [TestCase("an.ex.2 $%@:/", "a.topic.2 $%@:/", "publish-message:a.topic.2 %24%25%40%3A%2F@an.ex.2 %24%25%40%3A%2F")]
         public void ToUri_ShouldReturnTheExpectedResult(string exchange, string topic, string expectedResult)
         {
-            new PublishMessageUri(exchange, topic).ToUri().Should().Be(new Uri(expectedResult));
+            new PublishMessageUri(topic, exchange).ToUri().Should().Be(new Uri(expectedResult));
         }        
 
         [TestCase("", false, "", "", "")]
@@ -144,5 +144,12 @@ namespace LSL.MessageUris.Tests
                 .Throw<FormatException>()
                 .WithMessage(expectedMessage);
         }
+
+        [Test]
+        public void ImplicitCastToUri_ItShouldProduceTheExpectedUri()
+        {
+            Uri result = new PublishMessageUri("topic", "exchange");
+            result.ToString().Should().Be("publish-message:topic@exchange");
+        }        
     }
 }
