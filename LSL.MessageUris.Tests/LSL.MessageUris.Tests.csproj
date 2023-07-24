@@ -6,6 +6,15 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <SnkFile>LSL.snk</SnkFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="Exists('$(SnkFile)')">
+    <AssemblyOriginatorKeyFile>$(SnkFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>True</SignAssembly>      
+  </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="appveyor.testlogger" Version="2.0.0" />
     <PackageReference Include="coverlet.msbuild" Version="2.9.0">
