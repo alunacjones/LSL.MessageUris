@@ -27,7 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="LSL.MessageUris.Tests" />
+    <InternalsVisibleTo Include="LSL.MessageUris.Tests, PublicKeyToken=d4bd1f3083849a62" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\readme.md" Pack="true" PackagePath=""/>
