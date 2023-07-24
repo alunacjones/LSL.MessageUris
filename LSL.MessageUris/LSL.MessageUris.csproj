@@ -11,7 +11,7 @@
 
   <PropertyGroup>
     <IsPackable>true</IsPackable>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net451;netstandard2.0</TargetFrameworks>
     <Version>1.0.1</Version>
     <PackageVersion>1.0.1</PackageVersion>
     <PackageTags>uri;uris;custom;message;message-uri;service-bus;service;bus</PackageTags>
@@ -23,10 +23,17 @@
   </PropertyGroup>
 
   <PropertyGroup>
-      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>      
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="LSL.MessageUris.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="..\readme.md" Pack="true" PackagePath=""/>
   </ItemGroup>   
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.0' ">
+    <Reference Include="System.Web" />
+  </ItemGroup>
 </Project>

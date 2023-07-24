@@ -107,30 +107,30 @@ namespace LSL.MessageUris
         /// <returns></returns>
         public static bool TryParse(string uri, out PublishMessageUri result) => InnerTryParse(uri, out result).Success;
 
-        private static (bool Success, string Error) InnerTryParse(string uri, out PublishMessageUri result)
+        private static InnerParseResult InnerTryParse(string uri, out PublishMessageUri result)
         {
             if (!Uri.TryCreate(uri, UriKind.Absolute, out var realUri))
             {
                 result = null;
-                return (false, "Invalid URI format");
+                return new InnerParseResult(false, "Invalid URI format");
             }
 
             if (realUri.Scheme != "publish-message")
             {
                 result = null;
-                return (false, $"Expected a scheme of 'publish-message' but found '{realUri.Scheme}'");
+                return new InnerParseResult(false, $"Expected a scheme of 'publish-message' but found '{realUri.Scheme}'");
             }
 
             if (realUri.Host != string.Empty)
             {
                 result = null;
-                return (false, $"Expected to find no host name but found '{realUri.Host}'");
+                return new InnerParseResult(false, $"Expected to find no host name but found '{realUri.Host}'");
             }
 
             if (realUri.Segments.Length != 1)
             {
                 result = null;
-                return (false, $"Expected to find one path segment but found {realUri.Segments.Length} ({realUri.LocalPath})");
+                return new InnerParseResult(false, $"Expected to find one path segment but found {realUri.Segments.Length} ({realUri.LocalPath})");
             }
 
             var split = realUri.Segments[0].Split('@');
@@ -138,7 +138,7 @@ namespace LSL.MessageUris
             if (split.Length > 2)
             {
                 result = null;
-                return (false, $"Expected to find one '@' synmbol but found {split.Length - 1} ({realUri.LocalPath})");                
+                return new InnerParseResult(false, $"Expected to find one '@' synmbol but found {split.Length - 1} ({realUri.LocalPath})");                
             }
 
             var topic =  Uri.UnescapeDataString(split[0]);
@@ -149,7 +149,7 @@ namespace LSL.MessageUris
             result = new PublishMessageUri(topic, exchange);
             result.QueryParameters = HttpUtility.ParseQueryString(realUri.Query);
 
-            return (true, string.Empty);
+            return new InnerParseResult(true, string.Empty);
         }
 
         /// <summary>
