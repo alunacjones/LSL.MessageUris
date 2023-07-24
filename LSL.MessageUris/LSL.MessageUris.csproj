@@ -27,7 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="LSL.MessageUris.Tests, PublicKeyToken=d4bd1f3083849a62" />
+    <InternalsVisibleTo Include="LSL.MessageUris.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100d1da85597a23c286091b8c172f2aa267dff861cda0c6244f4ff92ad7f054335a9a2afd9daa24b61ad34be9af125fafd168fd4084ba1db88ae76731c113ab40096223f5485acdc633991b00aa13d182e66904e9be391305cc8ae32e43bc52d28021361750e8b1ad8331bb91bf8def37d4e19c77207ec979cf3c4d4c6b3c60dad0" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\readme.md" Pack="true" PackagePath=""/>
